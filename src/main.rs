@@ -1,5 +1,5 @@
 use sqlx::sqlite::{SqlitePool, SqlitePoolOptions};
-use sqlx::{FromRow};
+use sqlx::FromRow;
 
 #[derive(Debug, FromRow)]
 struct User {
@@ -8,9 +8,11 @@ struct User {
     email: String,
 }
 
-
 fn display_user(user: &User) {
-    println!("User ID: {}, Name: {}, Email: {}", user.id, user.name, user.email);
+    println!(
+        "User ID: {}, Name: {}, Email: {}",
+        user.id, user.name, user.email
+    );
 }
 
 async fn fetch_and_display_users(pool: &SqlitePool) -> Result<(), sqlx::Error> {
@@ -24,7 +26,7 @@ async fn fetch_and_display_users(pool: &SqlitePool) -> Result<(), sqlx::Error> {
 
     Ok(())
 }
-async fn insert_user(pool: &SqlitePool, name: &str, email: &str)-> Result<(), sqlx::Error> {
+async fn insert_user(pool: &SqlitePool, name: &str, email: &str) -> Result<(), sqlx::Error> {
     sqlx::query("INSERT INTO users (name, email) VALUES (?, ?)")
         .bind(name)
         .bind(email)
@@ -34,11 +36,8 @@ async fn insert_user(pool: &SqlitePool, name: &str, email: &str)-> Result<(), sq
 }
 #[tokio::main]
 async fn main() -> Result<(), sqlx::Error> {
-    // Create a connection pool
-    let pool = SqlitePoolOptions::new()
-        .connect("sqlite::memory:").await?;
+    let pool = SqlitePoolOptions::new().connect("sqlite::memory:").await?;
 
-    // Create the users table
     sqlx::query(
         "CREATE TABLE users (id INTEGER PRIMARY KEY, name TEXT NOT NULL, email TEXT NOT NULL UNIQUE)"
     ).execute(&pool).await?;
@@ -54,8 +53,6 @@ async fn main() -> Result<(), sqlx::Error> {
         insert_user(&pool, name, email).await?;
     }
 
-
-    // Fetch and display users
     fetch_and_display_users(&pool).await?;
 
     Ok(())
